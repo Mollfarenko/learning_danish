@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk</title>
+<link href="https://fonts.googleapis.com/css2?family=Petit+Formal+Script&family=Playfair+Display:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f4ef; --surface: #ffffff; --ink: #1a1a1a; --ink-muted: #888; --ink-faint: #ccc;
+            --accent: #2d6a4f; --accent-light: #e8f4f0; --border: #e8e4dd;
+            --correct: #27ae60; --correct-light: #eafaf1; --wrong: #c0392b; --wrong-light: #fdedec;
+            --tag-en-bg: #dbeafe; --tag-en-text: #1e40af; --tag-ua-bg: #fce7f3; --tag-ua-text: #9d174d;
+            --tag-da-bg: #fee2e2; --tag-da-text: #991b1b; --radius: 12px; --shadow: 0 2px 16px rgba(0,0,0,0.07);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+        .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 48px 40px; width: 100%; max-width: 400px; box-shadow: var(--shadow); }
+        .login-logo {
+                    font-family: 'Petit Formal Script', cursive;
+                    font-size: 42px;
+                    font-weight: 400;
+                    color: var(--accent);
+                    text-align: center;
+                    margin-bottom: 8px;
+                }
+        .login-subtitle { text-align: center; color: var(--ink-muted); font-size: 14px; font-weight: 300; margin-bottom: 36px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input { width: 100%; padding: 12px 16px; font-size: 15px; font-family: 'DM Sans', sans-serif; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,106,79,0.08); background: var(--surface); }
+        .btn-login { width: 100%; padding: 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; margin-top: 8px; }
+        .btn-login:hover { opacity: 0.88; } .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+        .login-error { color: var(--wrong); font-size: 13px; text-align: center; margin-top: 16px; min-height: 20px; }
+        .app { display: none; } .app.visible { display: block; }
+        nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .nav-left { display: flex; align-items: center; gap: 24px; }
+        .nav-logo {
+                    font-family: 'Petit Formal Script', cursive;
+                    font-size: 32px;
+                    font-weight: 400;
+                    color: var(--accent);
+                    letter-spacing: 0;
+                }
+        .nav-tabs { display: flex; gap: 4px; }
+        .nav-tab { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--ink-muted); font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+        .nav-tab:hover { background: var(--bg); color: var(--ink); } .nav-tab.active { background: var(--accent-light); color: var(--accent); }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .nav-user { font-size: 13px; color: var(--ink-muted); }
+        .btn-logout { font-size: 13px; color: var(--ink-muted); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+        .btn-logout:hover { border-color: var(--wrong); color: var(--wrong); }
+        .view { display: none; } .view.active { display: block; }
+        .add-page { max-width: 580px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .add-page h1 { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600; margin-bottom: 10px; color: var(--ink); line-height: 1.2; }
+        .add-page .subtitle { color: var(--ink-muted); font-size: 15px; margin-bottom: 40px; font-weight: 300; }
+        .input-row { display: flex; gap: 10px; margin-bottom: 16px; }
+        .input-row input { flex: 1; padding: 14px 18px; font-size: 16px; font-family: 'DM Sans', sans-serif; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); outline: none; transition: border-color 0.2s; }
+        .input-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,106,79,0.08); }
+        .btn-add { padding: 14px 28px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+        .btn-add:hover { opacity: 0.88; } .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { font-size: 14px; color: var(--ink-muted); min-height: 22px; margin-bottom: 28px; }
+        .status.error { color: var(--wrong); } .status.success { color: var(--accent); }
+        .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; text-align: left; box-shadow: var(--shadow); display: none; }
+        .result-card.visible { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .library-page { max-width: 740px; margin: 48px auto; padding: 0 20px; }
+        .library-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .library-header h2 { font-family: 'Playfair Display', serif; font-size: 28px; white-space: nowrap; }
+        .search-input { flex: 1; padding: 10px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); outline: none; }
+        .search-input:focus { border-color: var(--accent); }
+        .word-count { font-size: 13px; color: var(--ink-muted); margin-bottom: 18px; }
+        .word-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 14px; box-shadow: var(--shadow); transition: box-shadow 0.2s, transform 0.2s; animation: fadeIn 0.25s ease; }
+        .word-card:hover { box-shadow: 0 6px 28px rgba(0,0,0,0.1); transform: translateY(-1px); }
+        .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+        .card-top-left { flex: 1; }
+        .word-original { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1.1; }
+        .word-standardized { font-size: 12px; color: var(--ink-muted); margin-top: 3px; font-style: italic; }
+        .card-top-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 12px; }
+        .lang-tag { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .lang-english { background: var(--tag-en-bg); color: var(--tag-en-text); }
+        .lang-ukrainian { background: var(--tag-ua-bg); color: var(--tag-ua-text); }
+        .lang-danish { background: var(--tag-da-bg); color: var(--tag-da-text); }
+        .delete-btn { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 20px; line-height: 1; padding: 0; transition: color 0.2s; }
+        .delete-btn:hover { color: var(--wrong); }
+        .speak-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--ink-muted); cursor: pointer; font-size: 11px; font-family: 'DM Sans', sans-serif; font-weight: 500; line-height: 1; padding: 4px 8px; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+        .speak-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .speak-btns { display: flex; gap: 6px; margin-bottom: 14px; }
+        .play-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 16px; padding: 0 4px; line-height: 1; transition: opacity 0.2s; vertical-align: middle; }
+        .play-btn:hover { opacity: 0.7; }
+        .explanation-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 16px; }
+        .explanation-row .explanation { margin-bottom: 0; flex: 1; }
+        .explanation { font-size: 14px; color: #444; line-height: 1.7; margin-bottom: 16px; font-weight: 300; }
+        .translations { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+        .translation-pill { display: flex; align-items: center; gap: 7px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 13px; }
+        .pill-lang { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; }
+        .pill-lang.en { color: var(--tag-en-text); } .pill-lang.ua { color: var(--tag-ua-text); } .pill-lang.da { color: var(--tag-da-text); }
+        .pill-text { color: var(--ink); }
+        .examples-toggle { font-size: 13px; color: var(--accent); cursor: pointer; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+        .examples-body { display: none; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 16px; }
+        .examples-body.open { display: block; }
+        .example-group { margin-bottom: 16px; } .example-group:last-child { margin-bottom: 0; }
+        .example-line { display: flex; gap: 10px; margin-bottom: 5px; font-size: 13px; line-height: 1.6; }
+        .ex-lang { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; min-width: 26px; padding-top: 3px; flex-shrink: 0; }
+        .ex-lang.en { color: var(--tag-en-text); } .ex-lang.ua { color: var(--tag-ua-text); } .ex-lang.da { color: var(--tag-da-text); }
+        .ex-text { color: #333; }
+        .card-meta { margin-top: 14px; font-size: 12px; color: var(--ink-faint); }
+        .no-words { text-align: center; color: var(--ink-muted); font-size: 15px; padding: 80px 0; }
+        .practice-page { max-width: 620px; margin: 48px auto; padding: 0 20px; }
+        .practice-start { text-align: center; padding: 60px 0; }
+        .practice-start h2 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 12px; }
+        .practice-start p { color: var(--ink-muted); font-size: 15px; margin-bottom: 36px; font-weight: 300; }
+        .btn-start { padding: 14px 40px; font-size: 16px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; }
+        .btn-start:hover { opacity: 0.88; } .btn-start:disabled { opacity: 0.5; cursor: not-allowed; }
+        .practice-error { color: var(--wrong); font-size: 14px; margin-top: 16px; min-height: 20px; }
+        .progress-bar-wrap { margin-bottom: 28px; }
+        .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .progress-label { font-size: 13px; color: var(--ink-muted); }
+        .btn-end-session { font-size: 12px; color: var(--ink-muted); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+        .btn-end-session:hover { border-color: var(--wrong); color: var(--wrong); }
+        .progress-bar-bg { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+        .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); margin-bottom: 24px; animation: fadeIn 0.25s ease; }
+        .question-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-muted); margin-bottom: 14px; }
+        .question-explanation { font-family: 'Playfair Display', serif; font-size: 20px; line-height: 1.5; color: var(--ink); }
+        .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .choice-btn { padding: 16px 20px; font-size: 15px; font-family: 'Playfair Display', serif; background: var(--surface); color: var(--ink); border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; text-align: center; }
+        .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-light); transform: translateY(-1px); }
+        .choice-btn:disabled { cursor: default; }
+        .choice-btn.correct { background: var(--correct-light); border-color: var(--correct); color: var(--correct); }
+        .choice-btn.wrong { background: var(--wrong-light); border-color: var(--wrong); color: var(--wrong); }
+        .choice-btn.reveal { background: var(--correct-light); border-color: var(--correct); color: var(--correct); }
+        .feedback-row { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+        .feedback-msg { font-size: 14px; font-weight: 500; }
+        .feedback-msg.correct { color: var(--correct); } .feedback-msg.wrong { color: var(--wrong); }
+        .btn-next { padding: 12px 28px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; display: none; }
+        .btn-next.visible { display: block; } .btn-next:hover { opacity: 0.88; }
+        .summary-screen { text-align: center; padding: 60px 0; animation: fadeIn 0.4s ease; }
+        .summary-screen h2 { font-family: 'Playfair Display', serif; font-size: 34px; margin-bottom: 8px; }
+        .summary-screen .summary-sub { color: var(--ink-muted); font-size: 15px; margin-bottom: 40px; font-weight: 300; }
+        .score-circle { width: 140px; height: 140px; border-radius: 50%; background: var(--accent-light); border: 3px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 40px; }
+        .score-number { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 600; color: var(--accent); line-height: 1; }
+        .score-label { font-size: 12px; color: var(--accent); margin-top: 4px; }
+        .summary-stats { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; }
+        .stat-number.correct { color: var(--correct); } .stat-number.wrong { color: var(--wrong); }
+        .stat-label { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+        .btn-practice-again { padding: 14px 36px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; }
+        .btn-practice-again:hover { opacity: 0.88; }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-page">
+    <div class="login-box">
+        <div class="login-logo">Dansk</div>
+        <div class="login-subtitle">Log ind på din konto</div>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="loginEmail" placeholder="dig@eksempel.dk" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+            <label>Adgangskode</label>
+            <input type="password" id="loginPassword" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/>
+        </div>
+        <button class="btn-login" id="loginBtn" onclick="login()">Log ind</button>
+        <div class="login-error" id="loginError"></div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="app">
+    <nav>
+        <div class="nav-left">
+            <div class="nav-logo">Dansk</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showView('add', this)">Tilføj ord</button>
+                <button class="nav-tab" onclick="showView('library', this)">Mit bibliotek</button>
+                <button class="nav-tab" onclick="showView('practice', this)">Øv dig</button>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser"></span>
+            <button class="btn-logout" onclick="logout()">Log ud</button>
+        </div>
+    </nav>
+
+    <div class="view active" id="view-add">
+        <div class="add-page">
+            <h1>Lær et nyt ord</h1>
+            <p class="subtitle">Indtast et dansk ord du vil lære</p>
+            <div class="input-row">
+                <input type="text" id="wordInput" placeholder="f.eks. løbe, hyggelig, skønt..." autocomplete="off"/>
+                <button class="btn-add" id="addBtn" onclick="addWord()">Tilføj</button>
+            </div>
+            <div class="status" id="status"></div>
+            <div class="result-card" id="resultCard"></div>
+        </div>
+    </div>
+
+    <div class="view" id="view-library">
+        <div class="library-page">
+            <div class="library-header">
+                <h2>Mit bibliotek</h2>
+                <input type="text" class="search-input" id="searchInput" placeholder="Søg efter ord..." oninput="filterWords()"/>
+            </div>
+            <div class="word-count" id="wordCount"></div>
+            <div id="wordList"></div>
+        </div>
+    </div>
+
+    <div class="view" id="view-practice">
+        <div class="practice-page">
+            <div class="practice-start" id="practiceStart">
+                <h2>Øv dig</h2>
+                <p>Du vil se en forklaring på et ord — vælg det rigtige ord blandt 5 muligheder.</p>
+                <button class="btn-start" id="startBtn" onclick="startSession()">Start session</button>
+                <div class="practice-error" id="practiceError"></div>
+            </div>
+            <div id="practiceQuiz" style="display:none;">
+                <div class="progress-bar-wrap">
+                    <div class="progress-top">
+                        <span class="progress-label" id="progressLabel">0 / 0</span>
+                        <button class="btn-end-session" onclick="endSession()">Afslut session</button>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="question-card">
+                    <div class="question-label">Hvilket ord passer til denne forklaring?</div>
+                    <div class="question-explanation" id="questionExplanation"></div>
+                </div>
+                <div class="choices-grid" id="choicesGrid"></div>
+                <div class="feedback-row">
+                    <div class="feedback-msg" id="feedbackMsg"></div>
+                    <button class="btn-next" id="nextBtn" onclick="nextQuestion()">Næste &rarr;</button>
+                </div>
+            </div>
+            <div id="practiceSummary" style="display:none;">
+                <div class="summary-screen">
+                    <h2>Session afsluttet!</h2>
+                    <p class="summary-sub" id="summarySubtitle"></p>
+                    <div class="score-circle">
+                        <div class="score-number" id="scorePercent"></div>
+                        <div class="score-label">score</div>
+                    </div>
+                    <div class="summary-stats">
+                        <div class="stat-item"><div class="stat-number correct" id="statCorrect"></div><div class="stat-label">korrekte</div></div>
+                        <div class="stat-item"><div class="stat-number wrong" id="statWrong"></div><div class="stat-label">forkerte</div></div>
+                        <div class="stat-item"><div class="stat-number" id="statTotal"></div><div class="stat-label">besvaret</div></div>
+                    </div>
+                    <button class="btn-practice-again" onclick="resetPractice()">Øv igen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = "";
+    let allWords = [], practiceSession = [], currentIndex = 0, correctCount = 0, wrongCount = 0, answered = false;
+
+    function getToken() { return localStorage.getItem('wordapp_token'); }
+    function setToken(t) { localStorage.setItem('wordapp_token', t); }
+    function clearToken() { localStorage.removeItem('wordapp_token'); localStorage.removeItem('wordapp_user'); }
+    function setUser(e) { localStorage.setItem('wordapp_user', e); }
+
+    function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
+
+    async function init() {
+        var token = getToken();
+        if (!token) { showLoginPage(); return; }
+        try {
+            var r = await fetch(API + '/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+            if (!r.ok) { clearToken(); showLoginPage(); return; }
+            var u = await r.json();
+            showApp(u.email);
+        } catch(e) { showLoginPage(); }
+    }
+
+    function showLoginPage() { document.getElementById('loginPage').style.display = 'flex'; document.getElementById('mainApp').classList.remove('visible'); }
+    function showApp(email) { document.getElementById('loginPage').style.display = 'none'; document.getElementById('mainApp').classList.add('visible'); document.getElementById('navUser').textContent = email; }
+
+    async function login() {
+        var email = document.getElementById('loginEmail').value.trim();
+        var password = document.getElementById('loginPassword').value;
+        var btn = document.getElementById('loginBtn');
+        var err = document.getElementById('loginError');
+        err.textContent = '';
+        if (!email || !password) { err.textContent = 'Indtast venligst din e-mail og adgangskode.'; return; }
+        btn.disabled = true; btn.textContent = 'Logger ind...';
+        try {
+            var fd = new URLSearchParams();
+            fd.append('username', email); fd.append('password', password);
+            var r = await fetch(API + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd });
+            var d = await r.json();
+            if (!r.ok) { err.textContent = d.detail || 'Login mislykkedes.'; return; }
+            setToken(d.access_token); setUser(email); showApp(email);
+        } catch(e) { err.textContent = 'Kunne ikke oprette forbindelse til serveren.'; }
+        finally { btn.disabled = false; btn.textContent = 'Log ind'; }
+    }
+
+    function logout() { clearToken(); allWords = []; showLoginPage(); }
+
+    function langCode(l) { return {danish:'DA',english:'EN',ukrainian:'UA'}[l]||l; }
+    function langClass(l) { return {danish:'da',english:'en',ukrainian:'ua'}[l]||''; }
+    function langTagClass(l) { return {danish:'lang-danish',english:'lang-english',ukrainian:'lang-ukrainian'}[l]||''; }
+
+    function setStatus(msg, type) { var el = document.getElementById('status'); el.textContent = msg; el.className = 'status '+(type||''); }
+
+    function showView(name, tabEl) {
+        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+        document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
+        var target = document.getElementById('view-'+name);
+        if(target) target.classList.add('active');
+        if(tabEl) tabEl.classList.add('active');
+        if(name==='library') loadWords();
+    }
+
+    function parseExamples(str) {
+        var lines = str.split('\n').filter(function(l){return l.trim();}), groups = {};
+        lines.forEach(function(line){ var m = line.match(/^Example (\d+) \[(.+?)\]: (.+)$/); if(m){ if(!groups[m[1]]) groups[m[1]]=[]; groups[m[1]].push({lang:m[2],text:m[3]}); } });
+        return Object.values(groups);
+    }
+
+    function renderExamples(str) {
+        return parseExamples(str).map(function(g){
+            return '<div class="example-group">'+g.map(function(l){ return '<div class="example-line"><span class="ex-lang '+langClass(l.lang)+'">'+langCode(l.lang)+'</span><span class="ex-text">'+l.text+'</span></div>'; }).join('')+'</div>';
+        }).join('');
+    }
+
+    function playAudio(path) {
+    if(!path) return;
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = ctx.createBufferSource();
+    var gainNode = ctx.createGain();
+    gainNode.gain.value = 3.0; // boost volume — try values between 2.0 and 5.0
+    fetch(path)
+        .then(function(r){ return r.arrayBuffer(); })
+        .then(function(buf){ return ctx.decodeAudioData(buf); })
+        .then(function(decoded){
+            source.buffer = decoded;
+            source.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            source.start(0);
+        });
+    }
+
+    function renderCard(word, showDelete) {
+        if(showDelete===undefined) showDelete=true;
+        var date = new Date(word.created_at).toLocaleDateString('da-DK',{day:'numeric',month:'short',year:'numeric'});
+        var hasBoth = word.inflected && word.inflected !== word.standardized;
+        var sNote = hasBoth?'<div class="word-standardized">grundform: '+word.standardized+'</div>':'';
+        var dBtn = showDelete?'<button class="delete-btn" onclick="deleteWord('+word.id+')" title="Slet">&times;</button>':'';
+
+        // Word pronunciation buttons using stored audio
+        var speakBtns = hasBoth
+            ? '<div class="speak-btns">'+
+                (word.audio_inflected ? '<button class="speak-btn" onclick="playAudio(\''+word.audio_inflected+'\')" title="Udtale bøjet form">&#128264; '+word.inflected+'</button>' : '')+
+                (word.audio_standardized ? '<button class="speak-btn" onclick="playAudio(\''+word.audio_standardized+'\')" title="Udtale grundform">&#128264; '+word.standardized+'</button>' : '')+
+              '</div>'
+            : (word.audio_standardized ? '<div class="speak-btns"><button class="speak-btn" onclick="playAudio(\''+word.audio_standardized+'\')" title="Udtale">&#128264; '+word.standardized+'</button></div>' : '');
+
+        // Explanation with play button
+        var explanationRow = '<div class="explanation-row">'+
+            '<div class="explanation">'+word.explanation+'</div>'+
+            (word.audio_explanation ? '<button class="play-btn" onclick="playAudio(\''+word.audio_explanation+'\')" title="Hør forklaring">&#128264;</button>' : '')+
+            '</div>';
+
+        // English explanation (no audio, it's for reference only)
+        var explanationEnRow = '<div class="explanation" style="color:#666; font-style:italic;">'+word.explanation_english+'</div>';
+
+        // Examples with play buttons for Danish sentences
+        var exampleGroups = parseExamples(word.examples);
+        var examplesHtml = exampleGroups.map(function(g, i){
+            var audioPath = i === 0 ? word.audio_example_1 : word.audio_example_2;
+            return '<div class="example-group">'+
+                g.map(function(l){
+                    var isDanish = l.lang === 'danish';
+                    var playBtnHtml = (isDanish && audioPath) ? '<button class="play-btn" onclick="playAudio(\''+audioPath+'\')" title="Hør eksempel">&#128264;</button>' : '';
+                    return '<div class="example-line"><span class="ex-lang '+langClass(l.lang)+'">'+langCode(l.lang)+'</span><span class="ex-text">'+l.text+'</span>'+playBtnHtml+'</div>';
+                }).join('')+
+            '</div>';
+        }).join('');
+
+        return '<div class="word-card" id="card-'+word.id+'">'+
+            '<div class="card-top"><div class="card-top-left"><div class="word-original">'+word.original+'</div>'+sNote+'</div>'+
+            '<div class="card-top-right"><span class="lang-tag lang-danish">DA</span>'+dBtn+'</div></div>'+
+            speakBtns+
+            explanationRow+
+            explanationEnRow+
+            '<div class="translations">'+
+            '<div class="translation-pill"><span class="pill-lang en">EN</span><span class="pill-text">'+word.translation_english+'</span></div>'+
+            '<div class="translation-pill"><span class="pill-lang ua">UA</span><span class="pill-text">'+word.translation_ukrainian+'</span></div>'+
+            '</div>'+
+            '<button class="examples-toggle" onclick="toggleExamples(this)">&#9658; Vis eksempler</button>'+
+            '<div class="examples-body">'+examplesHtml+'</div>'+
+            '<div class="card-meta">Tilføjet '+date+'</div></div>';
+    }
+
+    function toggleExamples(btn) { var open=btn.nextElementSibling.classList.toggle('open'); btn.innerHTML=open?'&#9660; Skjul eksempler':'&#9658; Vis eksempler'; }
+
+    async function addWord() {
+        var input=document.getElementById('wordInput'), btn=document.getElementById('addBtn'), rc=document.getElementById('resultCard');
+        var word=input.value.trim();
+        if(!word){setStatus('Indtast venligst et ord.','error');return;}
+        btn.disabled=true; rc.classList.remove('visible'); setStatus('Slår ord op og genererer forklaring...','');
+        try {
+            var r=await fetch(API+'/words/',{method:'POST',headers:authHeaders(),body:JSON.stringify({original:word})});
+            var d=await r.json();
+            if(r.status===401){logout();return;}
+            if(!r.ok){setStatus('Fejl: '+d.detail,'error');return;}
+            input.value=''; setStatus('\u2713 "'+d.original+'" gemt i dit bibliotek.','success');
+            rc.innerHTML=renderCard(d,false); rc.classList.add('visible');
+        } catch(e){setStatus('Could not connect to server.','error');}
+        finally{btn.disabled=false;}
+    }
+
+    async function loadWords() {
+        try {
+            var r=await fetch(API+'/words/',{headers:authHeaders()});
+            if(r.status===401){logout();return;}
+            allWords=await r.json(); renderWordList(allWords);
+        } catch(e){ document.getElementById('wordList').innerHTML='<p class="no-words">Kunne ikke indlæse ord.</p>'; }
+    }
+
+    function renderWordList(words) {
+        var list=document.getElementById('wordList'), count=document.getElementById('wordCount');
+        count.textContent=words.length+' ord i dit bibliotek';
+        list.innerHTML=words.length===0?'<p class="no-words">Ingen ord endnu. Tilføj dit første ord ovenfor.</p>':words.map(function(w){return renderCard(w,true);}).join('');
+    }
+
+    function filterWords() {
+        var q=document.getElementById('searchInput').value.toLowerCase().trim();
+        if(!q){renderWordList(allWords);return;}
+        renderWordList(allWords.filter(function(w){ return w.original.toLowerCase().includes(q)||w.standardized.toLowerCase().includes(q)||w.inflected.toLowerCase().includes(q)||w.explanation.toLowerCase().includes(q)||w.explanation_english.toLowerCase().includes(q); }));
+    }
+
+    async function deleteWord(id) {
+        if(!confirm('Slet dette ord?')) return;
+        try {
+            var r=await fetch(API+'/words/'+id,{method:'DELETE',headers:authHeaders()});
+            if(r.status===401){logout();return;}
+            if(r.ok){allWords=allWords.filter(function(w){return w.id!==id;});renderWordList(allWords);}
+        } catch(e){alert('Kunne ikke slette ordet.');}
+    }
+
+    async function startSession() {
+        var btn=document.getElementById('startBtn'), err=document.getElementById('practiceError');
+        err.textContent=''; btn.disabled=true; btn.textContent='Indlæser...';
+        try {
+            var r=await fetch(API+'/practice/session',{headers:authHeaders()});
+            var d=await r.json();
+            if(r.status===401){logout();return;}
+            if(!r.ok){err.textContent=d.detail;return;}
+            practiceSession=d; currentIndex=0; correctCount=0; wrongCount=0;
+            document.getElementById('practiceStart').style.display='none';
+            document.getElementById('practiceSummary').style.display='none';
+            document.getElementById('practiceQuiz').style.display='block';
+            showQuestion();
+        } catch(e){err.textContent='Kunne ikke oprette forbindelse til serveren.';}
+        finally{btn.disabled=false;btn.textContent='Start session';}
+    }
+
+    function showQuestion() {
+        if(currentIndex>=practiceSession.length){showSummary();return;}
+        answered=false;
+        var q=practiceSession[currentIndex], total=practiceSession.length;
+        document.getElementById('progressLabel').textContent=(currentIndex+1)+' / '+total;
+        document.getElementById('progressFill').style.width=((currentIndex/total)*100)+'%';
+        document.getElementById('questionExplanation').textContent=q.explanation_quiz;
+        document.getElementById('feedbackMsg').textContent='';
+        document.getElementById('feedbackMsg').className='feedback-msg';
+        document.getElementById('nextBtn').classList.remove('visible');
+        var grid=document.getElementById('choicesGrid');
+        grid.innerHTML='';
+        q.choices.forEach(function(choice){
+            var btn=document.createElement('button');
+            btn.className='choice-btn'; btn.textContent=choice;
+            btn.onclick=function(){handleAnswer(choice,q);};
+            grid.appendChild(btn);
+        });
+    }
+
+    async function handleAnswer(chosen, question) {
+        if(answered) return;
+        answered=true;
+        var correct=chosen===question.correct_answer;
+        if(correct){correctCount++;}else{wrongCount++;}
+        document.querySelectorAll('.choice-btn').forEach(function(btn){
+            btn.disabled=true;
+            if(btn.textContent===question.correct_answer){btn.classList.add(correct?'correct':'reveal');}
+            else if(btn.textContent===chosen&&!correct){btn.classList.add('wrong');}
+        });
+        var fe=document.getElementById('feedbackMsg');
+        fe.textContent=correct?'\u2713 Korrekt!':'\u2717 Forkert \u2014 svaret var "'+question.correct_answer+'"';
+        fe.className='feedback-msg '+(correct?'correct':'wrong');
+        document.getElementById('nextBtn').classList.add('visible');
+        try { await fetch(API+'/practice/answer',{method:'POST',headers:authHeaders(),body:JSON.stringify({word_id:question.word_id,correct:correct})}); }
+        catch(e){console.error('Failed to save answer:',e);}
+    }
+
+    function nextQuestion(){currentIndex++;showQuestion();}
+
+    function endSession(){if(!confirm('Afslut session? Resterende ord gemmes til næste gang.'))return;showSummary();}
+
+    function showSummary(){
+        document.getElementById('practiceQuiz').style.display='none';
+        document.getElementById('practiceSummary').style.display='block';
+        var total=correctCount+wrongCount, percent=total>0?Math.round((correctCount/total)*100):0;
+        document.getElementById('scorePercent').textContent=percent+'%';
+        document.getElementById('statCorrect').textContent=correctCount;
+        document.getElementById('statWrong').textContent=wrongCount;
+        document.getElementById('statTotal').textContent=total;
+        var remaining=practiceSession.length-currentIndex;
+        document.getElementById('summarySubtitle').textContent=remaining>0?'Du besvarede '+total+' ord. '+remaining+' ord tilbage til næste gang.':'Du gennemførte alle ord i denne session!';
+    }
+
+    function resetPractice(){
+        document.getElementById('practiceSummary').style.display='none';
+        document.getElementById('practiceQuiz').style.display='none';
+        document.getElementById('practiceStart').style.display='block';
+        practiceSession=[];currentIndex=0;correctCount=0;wrongCount=0;answered=false;
+    }
+
+    document.getElementById('wordInput').addEventListener('keydown',function(e){if(e.key==='Enter')addWord();});
+    document.getElementById('loginPassword').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+
+    init();
+</script>
+<div style="position:fixed; bottom:16px; right:20px; font-size:11px; color:var(--ink-faint); font-style:italic; pointer-events:none;">
+    Created by Вітольд &amp; Claude
+</div>
+</body>
+</html>

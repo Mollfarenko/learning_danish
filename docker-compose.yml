@@ -1,0 +1,31 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: danskapp-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: danskapp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  app:
+    build: .
+    container_name: danskapp-app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./frontend:/app/frontend
+      - ./audio:/app/audio
+
+volumes:
+  postgres_data:
