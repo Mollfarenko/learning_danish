@@ -1,26 +1,25 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 
-# What the session endpoint returns — one question card
 class SessionWord(BaseModel):
     word_id: int
     explanation_quiz: str
     correct_answer: str
     choices: List[str]
+    audio_example_1: Optional[str] = None
+    audio_example_2: Optional[str] = None
 
     class Config:
         from_attributes = True
 
 
-# What the frontend sends when user clicks an answer
 class AnswerRequest(BaseModel):
     word_id: int
     correct: bool
 
 
-# What the server sends back after recording the answer
 class AnswerResponse(BaseModel):
     word_id: int
     correct: bool

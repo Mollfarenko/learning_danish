@@ -123,7 +123,7 @@
         .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); margin-bottom: 24px; animation: fadeIn 0.25s ease; }
         .question-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-muted); margin-bottom: 14px; }
         .question-explanation { font-family: 'Playfair Display', serif; font-size: 20px; line-height: 1.5; color: var(--ink); }
-        .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
         .choice-btn { padding: 16px 20px; font-size: 15px; font-family: 'Playfair Display', serif; background: var(--surface); color: var(--ink); border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; text-align: center; }
         .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-light); transform: translateY(-1px); }
         .choice-btn:disabled { cursor: default; }
@@ -148,6 +148,9 @@
         .stat-label { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
         .btn-practice-again { padding: 14px 36px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; }
         .btn-practice-again:hover { opacity: 0.88; }
+        .example-audio-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-example-audio { display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .btn-example-audio:hover { background: var(--accent); color: white; }
     </style>
 </head>
 <body>
@@ -215,7 +218,7 @@
         <div class="practice-page">
             <div class="practice-start" id="practiceStart">
                 <h2>Øv dig</h2>
-                <p>Du vil se en forklaring på et ord — vælg det rigtige ord blandt 5 muligheder.</p>
+                <p>Du vil se en forklaring på et ord — vælg det rigtige ord blandt 10 muligheder.</p>
                 <button class="btn-start" id="startBtn" onclick="startSession()">Start session</button>
                 <div class="practice-error" id="practiceError"></div>
             </div>
@@ -238,6 +241,7 @@
                     <div class="feedback-msg" id="feedbackMsg"></div>
                     <button class="btn-next" id="nextBtn" onclick="nextQuestion()">Næste &rarr;</button>
                 </div>
+                <div class="example-audio-btns" id="exampleAudioBtns" style="display:none;"></div>
             </div>
             <div id="practiceSummary" style="display:none;">
                 <div class="summary-screen">
@@ -475,6 +479,8 @@
         document.getElementById('feedbackMsg').textContent='';
         document.getElementById('feedbackMsg').className='feedback-msg';
         document.getElementById('nextBtn').classList.remove('visible');
+        document.getElementById('exampleAudioBtns').style.display='none';
+        document.getElementById('exampleAudioBtns').innerHTML='';
         var grid=document.getElementById('choicesGrid');
         grid.innerHTML='';
         q.choices.forEach(function(choice){
@@ -499,6 +505,51 @@
         fe.textContent=correct?'\u2713 Korrekt!':'\u2717 Forkert \u2014 svaret var "'+question.correct_answer+'"';
         fe.className='feedback-msg '+(correct?'correct':'wrong');
         document.getElementById('nextBtn').classList.add('visible');
+
+        // Show example audio buttons and sentences after answering
+        var audioDiv = document.getElementById('exampleAudioBtns');
+        audioDiv.innerHTML = '';
+        var wordData = allWords.find(function(w){ return w.id === question.word_id; });
+        if(question.audio_example_1 || question.audio_example_2) {
+            audioDiv.style.display = 'flex';
+            audioDiv.style.flexDirection = 'column';
+            audioDiv.style.gap = '12px';
+
+            var examples = wordData ? parseExamples(wordData.examples) : [];
+
+            [1, 2].forEach(function(n) {
+                var audioPath = n === 1 ? question.audio_example_1 : question.audio_example_2;
+                var exGroup = examples[n - 1];
+                if(!audioPath && !exGroup) return;
+
+                var wrapper = document.createElement('div');
+                wrapper.style.cssText = 'background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 16px;';
+
+                // Audio button
+                if(audioPath) {
+                    var btn = document.createElement('button');
+                    btn.className = 'btn-example-audio';
+                    btn.style.marginBottom = '10px';
+                    btn.innerHTML = '&#128264; Eksempel ' + n;
+                    btn.onclick = (function(p){ return function(){ playAudio(p); }; })(audioPath);
+                    wrapper.appendChild(btn);
+                }
+
+                // Example sentences
+                if(exGroup) {
+                    exGroup.forEach(function(line) {
+                        var row = document.createElement('div');
+                        row.style.cssText = 'display:flex; gap:8px; font-size:13px; line-height:1.6; margin-top:4px;';
+                        var isDanish = line.lang === 'danish';
+                        row.innerHTML = '<span class="ex-lang '+langClass(line.lang)+'" style="min-width:26px; padding-top:2px; flex-shrink:0;">'+langCode(line.lang)+'</span>'+
+                            '<span style="color:#333;'+(isDanish ? ' font-weight:500;' : '')+'">'+line.text+'</span>';
+                        wrapper.appendChild(row);
+                    });
+                }
+
+                audioDiv.appendChild(wrapper);
+            });
+        }
         try { await fetch(API+'/practice/answer',{method:'POST',headers:authHeaders(),body:JSON.stringify({word_id:question.word_id,correct:correct})}); }
         catch(e){console.error('Failed to save answer:',e);}
     }

@@ -21,10 +21,10 @@ def get_session(
     current_user: User = Depends(get_current_user)
 ):
     total_words = db.query(Word).filter(Word.user_id == current_user.id).count()
-    if total_words < 5:
+    if total_words < 10:
         raise HTTPException(
             status_code=400,
-            detail="You need at least 5 words in your library to start a practice session."
+            detail="You need at least 10 words in your library to start a practice session."
         )
 
     due_words = db.query(Word).outerjoin(Review).filter(
@@ -43,9 +43,9 @@ def get_session(
 
     for word in due_words:
         other_words = [w for w in all_words if w.id != word.id]
-        if len(other_words) < 4:
-            raise HTTPException(status_code=400, detail="You need at least 5 words in your library to start a practice session.")
-        wrong_choices = random.sample(other_words, min(4, len(other_words)))
+        if len(other_words) < 9:
+            raise HTTPException(status_code=400, detail="Du skal have mindst 10 ord i dit bibliotek for at starte en øvelsessession.")
+        wrong_choices = random.sample(other_words, min(9, len(other_words)))
 
         choices = [w.standardized for w in wrong_choices] + [word.standardized]
         random.shuffle(choices)
@@ -55,6 +55,8 @@ def get_session(
             explanation_quiz=word.explanation_quiz,
             correct_answer=word.standardized,
             choices=choices,
+            audio_example_1=word.audio_example_1,
+            audio_example_2=word.audio_example_2,
         ))
 
     random.shuffle(session)
